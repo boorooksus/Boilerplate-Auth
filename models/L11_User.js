@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const saltRounds = 10; // salt의 길이(salt는 암호화에 이용됨)
+var jwt = require('jsonwebtoken');
 
 const userschema = mongoose.Schema({
     name: {
@@ -54,6 +55,28 @@ userschema.pre('save', function (next) {
         next()
     }
 });
+
+userschema.methods.comparePassword = function(plainPassword, cb) {
+    // 암호화 전 비밀번호와 db의 비밀번호 비교
+    bcrypt.compare(plainPassword, this.password, function(err, isMatch){
+        if(err) return cb(err),
+            cb(null, isMatch)
+    })
+}
+
+userschema.methods.generateToken = function(cb){
+    var user = this;
+    // jasonwebtoken으로 토큰 생성
+    // _id: db의 id
+    var token = jwt.sign(user._id.toHexString(), 'secretToken') 
+
+    // 'secretToken(이름 맘대로 해도 됨)' 사용해서 누구인지 알 수 있음.
+    user.token = token
+    user.save(function(err, user){
+        if(err) return cb(errr)
+        cb(null, user)
+    })
+}
 
 const User = mongoose.model('User', userschema)
 
