@@ -10,6 +10,9 @@ const userschema = mongoose.Schema({
         trim: true, // trim: 스페이스 없애주는 역할 ex)he llo->hello
         unique: 1 // 같은 email 존재 못하도록
     },
+    password: {
+        type: String
+    },
     lastname: {
         type: String,
         maxlength: 50
