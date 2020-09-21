@@ -2,15 +2,18 @@ const express = require('express');
 const app = express();
 const port = 5000;
 const mongoose = require('mongoose');
-const { User } = require("./models/L11_User.js");
+const { User } = require("./models/User.js");
 const bodyParser = require('body-parser');
-const config = require('./config/L09_key');
+const config = require('./config/key');
+const cookieParser = require('cookie-parser');
+const {auth } = require('./middleware/auth')
 
 // application/x-www-form-urlencoded 데이터를 분석해서 가져올 수 있게함
 app.use(bodyParser.urlencoded({extended: true}));
 // application/jason 을 분석해서 가져올 수 있게함
 app.use(bodyParser.json());
 
+app.use(cookieParser());
 
 // 보안을 위해 mongoDB URI를 config 폴더의 key파일에서 가져옴
 mongoose.connect(config.mongoURI, {
@@ -22,7 +25,7 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.post('/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
   // 회원 가입 할 때 필요한 정보를 client에서 가져오면 db에 넣음
   
   // bodyParser 덕분에 req.body 안에 json형식으로 데이터가 저장됨
@@ -38,9 +41,9 @@ app.post('/register', (req, res) => {
   });
 })
 
-app.post('/login', (req, res) =>{
+app.post('/api/users/login', (req, res) =>{
     // 요청된 이메일을 데이터베이스에 있는지 찾는다.
-    User.findOne({email: reqq.body.email}, (err, user) =>{
+    User.findOne({email: req.body.email}, (err, user) =>{
         if(!user){
             return res.jason({
                 loginSuccess: false,
@@ -56,13 +59,32 @@ app.post('/login', (req, res) =>{
 
         // 비밀번호가 맞다면 토큰 생성
         user.generateToken((err, user) => {
-
-            // 다음 강의에서 계속.....
+            if(err) return res.status(400).send(err);
+            
+            // 토큰을 저장. 저장 위치는 쿠키 or local storage, session, ... (여기서는 쿠키에 저장)
+            res.cookie("x_auth", user.token)
+            .status(200)
+            .json({loginSuccess: true, userId: user._id})
             
         })
 
     })
     
+})
+
+// 미들웨어 - 콜백 함수 실행 전에 auth 실행
+app.get('/api/users/auth', auth, (req, res) => {
+    // authentication이 true면 여기 내용 실행
+    res.status(200).json({
+        _id: req.user._id,
+        isAdmin: req.user.role === 0 ? false : true,
+        isAuth: true,
+        email: req.user.email,
+        name: req.user.name,
+        lastname: req.user.lastname,
+        role: req.user.role,
+        image: req.user.image
+    })
 })
 
 app.listen(port, () => {
