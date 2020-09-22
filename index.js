@@ -39,7 +39,7 @@ app.post('/api/users/register', (req, res) => {
           success: true
       });
   });
-})
+});
 
 app.post('/api/users/login', (req, res) =>{
     // 요청된 이메일을 데이터베이스에 있는지 찾는다.
@@ -70,7 +70,7 @@ app.post('/api/users/login', (req, res) =>{
 
     })
     
-})
+});
 
 // 미들웨어 - 콜백 함수 실행 전에 auth 실행
 app.get('/api/users/auth', auth, (req, res) => {
@@ -85,7 +85,18 @@ app.get('/api/users/auth', auth, (req, res) => {
         role: req.user.role,
         image: req.user.image
     })
-})
+});
+
+// 로그아웃 - token을 지워서 인증이 안되게 만든다.
+app.get('/api/users/logout', auth, (req, res) => {
+    User.findOneAndUpdate({ _id: req.user._id }, { token: ""}, (err, doc) => {
+        if(err) return res.json({ success: false, err })
+        return res.status(200).send({
+            success: true
+        })
+    })
+
+});
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
