@@ -20,10 +20,7 @@ function App() {
             renders the first one that matches the current URL. */}
         <Switch>
           <Route exact path="/" component={LandingPage} />
-          {/*위와 같은 표현. 위가 더 깔끔함*/}
-          <Route path="/login">
-            <LoginPage />
-          </Route>
+          <Route path="/login" component={LoginPage}/>
           <Route path="/register" component={RegisterPage} />
         </Switch>
       </div>
