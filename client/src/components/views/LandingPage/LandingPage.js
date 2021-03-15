@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react'
 import axios from 'axios';
 import {withRouter} from 'react-router-dom'
+// import { useDispatch } from 'react-redux';
+// import { auth } from '../../../_actions/user_action';
 
 function LandingPage(props) {
 
     useEffect(() => {
             axios.get('/api/hello')
-            .then(response => console.log(response))
+            .then(response => console.log('hello res: ', response))
         }, [])
 
     const onClickHandler = () => {
@@ -20,6 +22,15 @@ function LandingPage(props) {
         })
     }
 
+    function authState(){
+        console.log('props: ', props);
+        
+
+        
+    }
+
+    
+
     return (
         <div style={{
             display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100vh'
@@ -29,6 +40,8 @@ function LandingPage(props) {
             <button onClick={onClickHandler}>
                 로그아웃
             </button>
+
+            {authState()}
         </div>
     )
 }

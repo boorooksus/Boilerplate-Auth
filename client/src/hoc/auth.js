@@ -13,10 +13,11 @@ export default function (SpecificComponent, option, adminRoute = null) {
 
         const dispatch = useDispatch();
 
+        // 백엔드에 request 날려서 현재 로그인 상태 가져옴
         useEffect(() => {
             // redux 사용
             dispatch(auth()).then(response =>{
-                console.log(response)
+                console.log('response:', response)
 
                 // 로그인 하지 않은 상태
                 if(!response.payload.isAuth){

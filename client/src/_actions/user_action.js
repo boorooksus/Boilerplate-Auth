@@ -5,6 +5,7 @@ import {
     AUTH_USER
 } from './types';
 export function loginUser(dataToSubmit){
+    // 서버로 리퀘스트 날림 -> 서버로 부터 받은 데이터를 request에 저장
     const request = axios.post('/api/users/login', dataToSubmit)
         .then(response => response.data)
 

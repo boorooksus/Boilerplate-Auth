@@ -49,7 +49,7 @@ app.post('/api/users/login', (req, res) =>{
     // 요청된 이메일을 데이터베이스에 있는지 찾는다.
     User.findOne({email: req.body.email}, (err, user) =>{
         if(!user){
-            return res.jason({
+            return res.json({
                 loginSuccess: false,
                 message: "입력한 이메일을 가진 유저가 없습니다."
             })
@@ -91,7 +91,7 @@ app.get('/api/users/auth', auth, (req, res) => {
     })
 });
 
-// 로그아웃 - token을 지워서 인증이 안되게 만든다.
+// 로그아웃 - 데이터베이스의 token을 지워서 인증이 안되게 만든다.
 app.get('/api/users/logout', auth, (req, res) => {
     User.findOneAndUpdate({ _id: req.user._id }, { token: ""}, (err, doc) => {
         if(err) return res.json({ success: false, err })
